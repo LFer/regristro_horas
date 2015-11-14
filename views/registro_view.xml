@@ -13,6 +13,7 @@
                         </group>
                         <button name="dow" type="object" string="Registrar Entrada"/>
                         <button name="dummy" string="Registrar Salida"/>
+                        <button name="horas_trabajadas" type="object" string="Calcular Horas Trabajadas"/>
                         <group>
                             <field name="day"/>
                             <field name="hours"/>
