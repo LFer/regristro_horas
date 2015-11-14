@@ -1,61 +1,62 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <openerp>
     <data>
-        <!--
-        <record model="ir.ui.view" id="course_form_view">
-            <field name="name">course.form</field>
-            <field name="model">openacademy.course</field>
+        <record model="ir.ui.view" id="registro_form_view">
+            <field name="name">registro.form</field>
+            <field name="model">registro</field>
             <field name="arch" type="xml">
-                <form string="Course Form">
+                <form string="Registro de Horas">
                     <sheet>
                         <group>
-                            <field name="name"/>
-                            <field name="responsible_id"/>
+                            <field name="check_in"/>
+                            <field name="check_out"/>
                         </group>
-                        <notebook>
-                            <page string="Description">
-                                <field name="description"/>
-                            </page>
-                            <page string="Sessions">
-                                <field name="session_ids">
-                                    <tree string="Registered sessions">
-                                        <field name="name"/>
-                                        <field name="instructor_id"/>
-                                    </tree>
-                                </field>
-                            </page>
-                        </notebook>
+                        <button name="dow" type="object" string="Registrar Entrada"/>
+                        <button name="dummy" string="Registrar Salida"/>
+                        <group>
+                            <field name="day"/>
+                            <field name="hours"/>
+                            <field name="left"/>
+                            <field name="overhour"/>
+                        </group>                        
+                        <field name="detalle_ids" widget="one2many_list" mode="tree">
+                            <tree string="Detalle" editable="bottom">
+                                <field name="day"/>
+                                <field name="hours"/>
+                                <field name="left"/>
+                                <field name="overhour"/>
+                            </tree>
+                        </field>
                     </sheet>
                 </form>
             </field>
         </record>
-        <record model="ir.ui.view" id="course_search_view">
-            <field name="name">course.search</field>
-            <field name="model">openacademy.course</field>
-            <field name="arch" type="xml">
-                <search>
-                    <field name="name"/>
-                    <field name="description"/>
-                    <filter name="my_courses" string="My Courses"
-                            domain="[('responsible_id', '=', uid)]"/>
-                    <group string="Group By">
-                        <filter name="by_responsible" string="Responsible"
-                                context="{'group_by': 'responsible_id'}"/>
-                    </group>
-                </search>
-            </field>
-        </record>
-        -->
-        
-        <!-- override the automatically generated list view for courses -->
         <!--
-        <record model="ir.ui.view" id="course_tree_view">
-            <field name="name">course.tree</field>
-            <field name="model">openacademy.course</field>
+                        <page string="Alquiler por temporada" attrs="{ 'invisible' : [ ( 'state', 'in', [ 'enventa' ] ) ] }" >
+                    <field name="temporada_ids" widget="one2many_list" mode="tree">
+                        <tree string="Alquiler por temporada" editable="bottom">
+                            <field name="cliente_1"/>
+                            <field name="usuario_1"/>
+                            <field name="currency_al" domain="['|',( 'name','=','USD' ),( 'name','=','UYP' )]" />
+                            <field name="fecha_inicio" on_change="get_number_of_days(fecha_inicio,fecha_fin, rent_day)" />
+                            <field name="fecha_fin" on_change="get_number_of_days(fecha_inicio,fecha_fin, rent_day)" />
+                            <field name="rent_day"/>
+                            <field name="rent_price"/>
+                            <field name="result"/>
+                            <field name="costo_alquiler"/>
+                            <field name="pago_1"/>
+                        </tree>
+                    </field>
+                </page>
+        -->
+
+        <record model="ir.ui.view" id="registro_tree_view">
+            <field name="name">registro.tree</field>
+            <field name="model">registro</field>
             <field name="arch" type="xml">
-                <tree string="Course Tree">
-                    <field name="name"/>
-                    <field name="responsible_id"/>
+                <tree string="Registro de Horas">
+                    <field name="check_in"/>
+                    <field name="check_out"/>
                 </tree>
             </field>
         </record>
