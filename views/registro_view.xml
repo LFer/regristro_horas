@@ -11,21 +11,27 @@
                             <field name="check_in"/>
                             <field name="check_out"/>
                         </group>
+                        <button name="horas_trabajadas" type="object" string="Calcular Horas Trabajadas"/>
+                        <!--
                         <button name="dow" type="object" string="Registrar Entrada"/>
                         <button name="dummy" string="Registrar Salida"/>
-                        <button name="horas_trabajadas" type="object" string="Calcular Horas Trabajadas"/>
+                        
                         <group>
                             <field name="day"/>
                             <field name="hours"/>
                             <field name="left"/>
                             <field name="overhour"/>
-                        </group>                        
+                        </group>
+                        -->                        
                         <field name="detalle_ids" widget="one2many_list" mode="tree">
                             <tree string="Detalle" editable="bottom">
                                 <field name="day"/>
                                 <field name="hours"/>
+                                <field name="check_in"/>
+                                <field name="check_out"/>
                                 <field name="left"/>
                                 <field name="overhour"/>
+                                <field name="week_load" widget="progressbar"/>
                             </tree>
                         </field>
                     </sheet>
@@ -56,8 +62,12 @@
             <field name="model">registro</field>
             <field name="arch" type="xml">
                 <tree string="Registro de Horas">
+                    <field name="day"/>
                     <field name="check_in"/>
                     <field name="check_out"/>
+                    <field name="hours"/>
+                    <field name="left"/>
+                    <field name="overhour"/>                    
                 </tree>
             </field>
         </record>

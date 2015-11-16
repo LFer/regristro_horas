@@ -13,39 +13,38 @@ import math
 
 class registro(models.Model):
     _name="registro"
+    _rec_name="day"
 #        
     check_in = fields.Datetime(string = 'Entrada', default = fields.Date.context_today)
     check_out = fields.Datetime(string = 'Salida')
     detalle_ids = fields.One2many(comodel_name='detalle', inverse_name='registro_id')
     #para probar las funciones
     day = fields.Char(string="Dia")
-    hours = fields.Char(string="Horas")
+    hours = fields.Char(string="Tiempo Trabajado")
     left = fields.Char(string="Compensar")
     overhour = fields.Char(string="Horas Extras")
+    week_load = fields.Float(string="Carga Semanal")#, compute='_taken_seats')
 
-    @api.one
-    def dow(self):
-        pdb.set_trace()
-        var = str((datetime.date.today().strftime("%A"),datetime.date.today().strftime("%d"),"de",datetime.date.today().strftime("%B"),"del", datetime.date.today().strftime("%Y"))).replace("'","").replace(",","")
-        date = self.check_in
-        days=["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"]
-        dayNumber=date.weekday()
 
-        print days[dayNumber]    
-    
+
+
     @api.onchange('day')
     def fecha(self):
 #        pdb.set_trace()
+
         if not self.day:
             var = str((datetime.date.today().strftime("%A"),datetime.date.today().strftime("%d"),"de",datetime.date.today().strftime("%B"),"del", datetime.date.today().strftime("%Y"))).replace("'","").replace(",","").replace("(","").replace(")","")
             self.day = var
         else:
             print "No lo logro"
 
-#    @api.onchange('day')
+            
+
     @api.one
     def horas_trabajadas(self):
-#        pdb.set_trace()        
+        tabla = self.detalle_ids.ids     
+        for x in tabla:
+            self.env.cr.execute(""" DELETE FROM ONLY detalle WHERE id = %(x)s  """,{'x':x})
         res = ""
         if (self.check_out and self.check_in) and (self.check_in <= self.check_out):
             DATETIME_FORMAT = "%Y-%m-%d %H:%M:%S"
@@ -55,22 +54,50 @@ class registro(models.Model):
             diff_day = timedelta.days + float(timedelta.seconds) / 3600
             res = diff_day
             self.hours = res
-        return res
-#        horas divido entre 3600
-#        minutos divido entre 60
-            # puede servir
-            # c = time.strptime("2002-03-14 17:42:00","%Y-%m-%d %H:%M:%S")
-            # t = time.mktime(c)
-            # t = t + 1800 #30 minutes is 1800 secs
-            # time.strftime("%Y-%m-%d %H:%M:%S",time.localtime(t))
-            # '2002-03-14 18:12:00'
+            horas = round(math.floor(diff_day))
+            x = res - int(res)
+            minutos = x*60
+            minutosfloor = round(math.floor(minutos))
+            segundos = minutos/60
+            segundosfloor = str(segundos - int(segundos))[1:4].replace('.',':')
+            #para devolver pasamos todo a strings
+            horastring = str(horas).replace('.',':').replace('0','')
+            minutostring = str(minutosfloor).replace('0','').replace('.','')
+            horas_trabajadas = horastring + minutostring
+            self.hours = horas_trabajadas
+        if not self.check_out:
+            raise exceptions.except_orm(_('Error!'), _('Debe Ingresar un Horario de Salida.'))
+        if horas >= 9:
+            pdb.set_trace()
+            self.overhour = str(int(horas-9)) + ":" + minutostring
+            self.left = ''
+        else:
+            self.left = str(int(math.fabs(int(horas-9)))) + ":" + str(int(60-minutos))
+            self.overhour = ''
+            
+        lineas = {
+                'day':self.day,
+                'hours':self.hours,
+                'left':self.left,
+                'overhour':self.overhour,
+                'check_in':self.check_in,
+                'check_out':self.check_out,
+                }
+        lineas2=[(0,0,lineas)]
+        self.write({'detalle_ids':lineas2})
+        return        
+
+
 registro()
 
 class detalle(models.Model):
     _name="detalle"
 
     registro_id = fields.Many2one('registro')
-    day = fields.Char(string="Dia")
-    hours = fields.Char(string="Horas")
-    left = fields.Char(string="Compensar")
-    overhour = fields.Char(string="Horas Extras")
+    day = fields.Text(string="Dia")
+    hours = fields.Text(string="Horas")
+    left = fields.Text(string="Compensar")
+    overhour = fields.Text(string="Horas Extras")
+    check_in = fields.Datetime(string = 'Entrada')
+    check_out = fields.Datetime(string = 'Salida')    
+    week_load = fields.Float(string="Carga Semanal")#, compute='_taken_seats')
