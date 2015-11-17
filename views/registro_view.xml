@@ -12,7 +12,6 @@
                             <field name="check_out"/>
                         </group>
                         <button name="horas_trabajadas" type="object" string="Calcular Horas Trabajadas"/>
-                        <!--
                         <button name="dow" type="object" string="Registrar Entrada"/>
                         <button name="dummy" string="Registrar Salida"/>
                         
@@ -22,7 +21,6 @@
                             <field name="left"/>
                             <field name="overhour"/>
                         </group>
-                        -->                        
                         <field name="detalle_ids" widget="one2many_list" mode="tree">
                             <tree string="Detalle" editable="bottom">
                                 <field name="day"/>

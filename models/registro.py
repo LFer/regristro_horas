@@ -36,22 +36,19 @@ class registro(models.Model):
     @api.onchange('hours')
     def fecha_this_will_work(self):
         if self.hours:
-            pdb.set_trace()
+            #pdb.set_trace()
             pass
         else:    
             lista = self.detalle_ids
-            if len(linsta)>8:
+            if len(lista)>8:
                 print "Hello"
     @api.one
     @api.onchange('day')
     def fecha(self):
+        algo = self.day = str((datetime.date.today().strftime("%A"),datetime.date.today().strftime("%d"),"de",datetime.date.today().strftime("%B"),"del", datetime.date.today().strftime("%Y"))).replace("'","").replace(",","").replace("(","").replace(")","")
+        return algo 
 #        pdb.set_trace()
-        if not self.day:
-            var = str((datetime.date.today().strftime("%A"),datetime.date.today().strftime("%d"),"de",datetime.date.today().strftime("%B"),"del", datetime.date.today().strftime("%Y"))).replace("'","").replace(",","").replace("(","").replace(")","")
-            self.day = var
-        else:
-            print "No lo logro"
-#        pdb.set_trace()
+        
    
 
 
@@ -85,7 +82,7 @@ class registro(models.Model):
 
     @api.one
     def horas_trabajadas(self):
-#        pdb.set_trace()
+        pdb.set_trace()
         self._check_lines()
         res = ""
         if (self.check_out and self.check_in) and (self.check_in <= self.check_out):
@@ -93,41 +90,62 @@ class registro(models.Model):
             to_dt = datetime.datetime.strptime(self.check_out, DATETIME_FORMAT)
             from_dt = datetime.datetime.strptime(self.check_in, DATETIME_FORMAT)
             timedelta = to_dt - from_dt
-            diff_day = timedelta.days + float(timedelta.seconds) / 3600
+            diff_day = float(timedelta.seconds) / 3600
             res = diff_day
-            self.hours = res
+#            self.hours = res
+
             horas = round(math.floor(diff_day))
-            x = res - int(res)
-            minutos = x*60
-            minutosfloor = round(math.floor(minutos))
-            segundos = minutos/60
-            segundosfloor = str(segundos - int(segundos))[1:4].replace('.',':')
-            #para devolver pasamos todo a strings
-            horastring = str(horas).replace('.',':').replace('0','')
-            minutostring = str(minutosfloor).replace('0','').replace('.','')
-            horas_trabajadas = horastring + minutostring
-            self.hours = horas_trabajadas
-        if not self.check_out:
-            raise exceptions.except_orm(_('Error!'), _('Debe Ingresar un Horario de Salida.'))
-        if horas >= 9:
-#            pdb.set_trace()
-            self.overhour = str(int(horas-9)) + ":" + minutostring
-            self.left = ''
-        else:
-            self.left = str(int(math.fabs(int(horas-9)))) + ":" + str(int(60-minutos))
-            self.overhour = ''
-            
-        lineas = {
-                'day':self.day,
-                'hours':self.hours,
-                'left':self.left,
-                'overhour':self.overhour,
-                'check_in':self.check_in,
-                'check_out':self.check_out,
-                }
-        lineas2=[(0,0,lineas)]
-        self.write({'detalle_ids':lineas2})
-        return        
+            if horas.is_integer():
+                minuts = diff_day - int(diff_day)
+                minuts2 = minuts*60
+                miutosletra = str(minuts2).replace('.','').replace('0','')
+                horaletra = str(horas).replace('.',':') #.replace('0','00:')
+                self.hours = horaletra + miutosletra
+#                self.overhour = 
+    
+    #            horas = diff_day - int(diff_day)
+                horastring = str(horas).replace('.',':').replace('0','')
+            if res - int(res) == 0:
+                self.hours = horastring + "00"
+#            else:
+                x = res - int(res)
+                minutos = x*60
+                minutosfloor = round(math.floor(minutos))
+                segundos = minutos/60
+                segundosfloor = str(segundos - int(segundos))[1:4].replace('.',':')
+                #para devolver pasamos todo a strings
+                minutostring = str(minutosfloor).replace('0','').replace('.','')
+                horas_trabajadas = horastring + minutostring
+                self.hours = horas_trabajadas
+                if not self.check_out:
+                    raise exceptions.except_orm(_('Error!'), _('Debe Ingresar un Horario de Salida.'))
+                if horas >= 9:
+    #                if res - int(res) == 0:
+        #            pdb.set_trace()
+                    x = res - int(res)
+                    minutos = x*60
+                    minutosfloor = round(math.floor(minutos))
+                    minutostring = str(minutosfloor).replace('0','').replace('.','')
+                    if minutostring == '':
+                        self.overhour = ''
+                    else:
+                        self.overhour = str(int(horas-9)) + ":" + minutostring + ""
+                        self.left = ''
+                else:
+                    self.left = str(int(math.fabs(int(horas-9)))) + ":" + str(int(60-minutos))
+                    self.overhour = ''
+                    
+                lineas = {
+                        'day':self.day,
+                        'hours':self.hours,
+                        'left':self.left,
+                        'overhour':self.overhour,
+                        'check_in':self.check_in,
+                        'check_out':self.check_out,
+                        }
+                lineas2=[(0,0,lineas)]
+                return self.write({'detalle_ids':lineas2})
+                
 
 
 registro()
