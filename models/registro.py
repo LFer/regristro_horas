@@ -15,16 +15,17 @@ class registro(models.Model):
     _name="registro"
     _rec_name="day"
 #
-    check_in = fields.Datetime(string = 'Entrada', default = datetime.date.today())
+    check_in = fields.Datetime(string = 'Entrada', default =datetime.date.today())
     check_out = fields.Datetime(string = 'Salida')
     detalle_ids = fields.One2many(comodel_name='detalle', inverse_name='registro_id')#, readonly=True)
     #para probar las funciones
-    day = fields.Char(string="Dia")
+    day = fields.Char(string="Dia", compute='_get_day')
     hours = fields.Char(string="Tiempo Trabajado")
     left = fields.Char(string="Compensar")
     overhour = fields.Char(string="Horas Extras")
     week_load = fields.Float(string="Carga Semanal")#, compute='_week_load')
     var = fields.Float(string="test", default="3")
+    hora_aproximada = fields.Char(string="Hora estamiada de relevo")
 
 
 
@@ -37,8 +38,17 @@ class registro(models.Model):
     #     else:
     #         self.week_load = 100.0 * self.hours / 45
 
+    @api.one
+    @api.depends('day')
+    def _get_day(self):
+        day = str((datetime.date.today().strftime("%A"),datetime.date.today().strftime("%d"),"de",datetime.date.today().strftime("%B"),"del", datetime.date.today().strftime("%Y"))).replace("'","").replace(",","").replace("(","").replace(")","")
+        self.day = day
 
-
+    @api.one
+    def _check_lenght_lines(self):
+#        
+        if len(self.detalle_ids)>=5:
+            raise exceptions.ValidationError("No puede agregar mas de 5 linas por semana!")
     def _function(self):
         i = 0
         if self.var<=36:
@@ -49,16 +59,34 @@ class registro(models.Model):
 
     @api.one
     def _check_lenght_lines(self):
-#        pdb.set_trace()
+#        
         if len(self.detalle_ids)>=5:
             raise exceptions.ValidationError("No puede agregar mas de 5 linas por semana!")
 
     @api.one
-    @api.onchange('day')
-    def fecha(self):
-        day = self.day = str((datetime.date.today().strftime("%A"),datetime.date.today().strftime("%d"),"de",datetime.date.today().strftime("%B"),"del", datetime.date.today().strftime("%Y"))).replace("'","").replace(",","").replace("(","").replace(")","")
-        return day
+    @api.onchange('check_in')
+    def fecha_entrada(self):
+#        pdb.set_trace()
+        day = str((datetime.date.today().strftime("%A"),datetime.date.today().strftime("%d"),"de",datetime.date.today().strftime("%B"),"del", datetime.date.today().strftime("%Y"))).replace("'","").replace(",","").replace("(","").replace(")","")
+        if not self.check_in:
+            pass
+        else:
+            self.day = day
 
+    @api.one
+    @api.onchange('check_in')
+    def fecha(self):
+#        pdb.set_trace()
+        day = str((datetime.date.today().strftime("%A"),datetime.date.today().strftime("%d"),"de",datetime.date.today().strftime("%B"),"del", datetime.date.today().strftime("%Y"))).replace("'","").replace(",","").replace("(","").replace(")","")
+        if not self.day:
+            self.day = day
+        else:
+            self.day = day
+        
+        if self.day:
+            self.day = day
+        else:
+            self.day = day            
 
     @api.one
     def _check_lines(self):#TODO Hacerla mas escricta
@@ -84,6 +112,8 @@ class registro(models.Model):
             tiempo_trabajado = to_dt - from_dt
             self.hours = tiempo_trabajado
             tope = datetime.timedelta(0, 32400)
+            salida_aproximada = from_dt + tope
+            self.hora_aproximada = salida_aproximada
             if tiempo_trabajado.seconds == tope.seconds:
                 self.left = ''
                 self.overhour = ''
@@ -118,7 +148,7 @@ class detalle(models.Model):
     _name="detalle"
 
     registro_id = fields.Many2one('registro')
-    day = fields.Char   (string="Dia")
+    day = fields.Char(string="Dia", compute='_get_day')
     hours = fields.Char(string="Horas")
     left = fields.Char(string="Compensar")
     overhour = fields.Char(string="Horas Extras")
@@ -133,3 +163,9 @@ class detalle(models.Model):
     #         self.week_load = 0.0
     #     else:
     #         self.week_load = 100 * self.hours/9
+
+    @api.one
+    @api.depends('day')
+    def _get_day(self):
+        day = str((datetime.date.today().strftime("%A"),datetime.date.today().strftime("%d"),"de",datetime.date.today().strftime("%B"),"del", datetime.date.today().strftime("%Y"))).replace("'","").replace(",","").replace("(","").replace(")","")
+        self.day = day
