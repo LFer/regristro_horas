@@ -8,22 +8,37 @@
                 <form string="Registro de Horas">
                     <sheet>
                         <group>
+                            <h1>
+                                <field name="name"/>
+                            </h1>
+                        </group>
+                        <group>
                             <field name="check_in"/>
                             <field name="check_out"/>
-                            <!--<field name="hora_aproximada"/>-->
+                            <field name="hora_aproximada"/>
                         </group>
                         <button name="horas_trabajadas" type="object" string="Calcular Horas Trabajadas"/>
+                        <button name="estimar_horas_trabajadas" type="object" string="Estimar Salida"/>
+                        <button name="sumer_horas_semanales" type="object" string="Semanales"/>
                         <field name="detalle_ids" widget="one2many_list" mode="tree">
                             <tree string="Detalle" editable="bottom">
                                 <field name="day"/>
-                                <field name="hours"/>
                                 <field name="check_in"/>
                                 <field name="check_out"/>
+                                <field name="hours"/>
                                 <field name="left"/>
                                 <field name="overhour"/>
                                 <field name="week_load" widget="progressbar"/>
                             </tree>
                         </field>
+                            <group class="oe_subtotal_footer oe_right" colspan="2" name="order_total">
+                                <div class="oe_subtotal_footer_separator oe_inline">
+                                    <label for="week_load" />
+                                    <button name="button_dummy"  string="(update)" class="oe_edit_only oe_link"/>
+                                </div>
+                                <field name="week_load" nolabel="1" class="oe_subtotal_footer_separator"/>
+                            </group>
+                        <div class="oe_clear"/>
                     </sheet>
                 </form>
             </field>
@@ -52,7 +67,7 @@
             <field name="model">registro</field>
             <field name="arch" type="xml">
                 <tree string="Registro de Horas">
-                    <field name="day"/>
+                    <field name="name"/>
                     <field name="check_in"/>
                     <field name="check_out"/>
                     <field name="hours"/>
