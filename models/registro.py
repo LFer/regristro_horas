@@ -26,8 +26,9 @@ class registro(models.Model):
     left = fields.Char(string="Compensar")
     overhour = fields.Char(string="Horas Extras")
     week_load = fields.Float(string="Carga Semanal")#, compute='_week_load')
-    var = fields.Float(string="test", default="3")
+    var = fields.Char(string="Carga Semanal")#, compute='sumer_horas_semanales')
     hora_aproximada = fields.Char(string="Hora estamiada de relevo")
+
 
 
 
@@ -51,12 +52,14 @@ class registro(models.Model):
 #
         if len(self.detalle_ids)>=5:
             raise exceptions.ValidationError("No puede agregar mas de 5 linas por semana!")
-    def _function(self):
-        i = 0
-        if self.var<=36:
-            for x in (self.detalle_ids):
-                i += x.hours
-        self.var = i
+
+
+    # def _function(self):
+    #     i = 0
+    #     if self.var<=36:
+    #         for x in (self.detalle_ids):
+    #             i += x.hours
+    #     self.var = i
 
 
     @api.one
@@ -126,109 +129,25 @@ class registro(models.Model):
 
     @api.one
     def sumer_horas_semanales(self):
-        pdb.set_trace()
         DATETIME_FORMAT = "%H:%M:%S"
+        FORMAT0 = "%H:%M:%S"
         x = self.detalle_ids
-
-        #-------------------------------------------------------------#
-        lunes1 = datetime.datetime.strptime(x[0].hours, DATETIME_FORMAT)
-        lunes_hora = lunes1.hour
-        lunes_min = lunes1.minute
-        lunes_sec = lunes1.second
-
-        martes1 = datetime.datetime.strptime(x[1].hours, DATETIME_FORMAT)
-        martes_hora = martes1.hour
-        martes_min = martes1.minute
-        martes_sec = martes1.second
-
-        miercoles1 = datetime.datetime.strptime(x[2].hours, DATETIME_FORMAT)
-        miercoles_hora = miercoles1.hour
-        miercoles_min = miercoles1.minute
-        miercoles_sec = miercoles1.second
-
-        jueves1 = datetime.datetime.strptime(x[3].hours, DATETIME_FORMAT)
-        jueves_hora = jueves1.hour
-        jueves_min = jueves1.minute
-        jueves_sec = jueves1.second
-
-        viernes1 = datetime.datetime.strptime(x[4].hours, DATETIME_FORMAT)
-        viernes_hora = viernes1.hour
-        viernes_min = viernes1.minute
-        viernes_sec = viernes1.second
-
-        #-------------------------------------------------------------#
-        # lunes2 = datetime.datetime.strptime(x[0].left, DATETIME_FORMAT)
-        # lunes_hora_left = lunes2.hour
-        # lunes_min_left = lunes2.minute
-        # lunes_sec_left = lunes2.second
-
-        # martes2 = datetime.datetime.strptime(x[1].left, DATETIME_FORMAT)
-        # martes_hora_left = martes2.hour
-        # martes_min_left = martes2.minute
-        # martes_sec_left = martes2.second
-
-        miercoles2 = datetime.datetime.strptime(x[2].left, DATETIME_FORMAT)
-        miercoles_hora_left = miercoles2.hour
-        miercoles_min_left = miercoles2.minute
-        miercoles_sec_left = miercoles2.second
-
-        # jueves2 = datetime.datetime.strptime(x[3].left, DATETIME_FORMAT)
-        # jueves_hora_left = jueves2.hour
-        # jueves_min_left = jueves2.minute
-        # jueves_sec_left = jueves2.second
-
-        viernes2 = datetime.datetime.strptime(x[4].left, DATETIME_FORMAT)
-        viernes_hora_left = viernes2.hour
-        viernes_min_left = viernes2.minute
-        viernes_sec_left = viernes2.second
-
-        #-------------------------------------------------------------#
-        lunes3 = datetime.datetime.strptime(x[0].overhour, DATETIME_FORMAT)
-        lunes_hora_extra = lunes3.hour
-        lunes_min_extra = lunes3.minute
-        lunes_sec_extra = lunes3.second
-
-        martes3 = datetime.datetime.strptime(x[1].overhour, DATETIME_FORMAT)
-        martes_hora_extra = martes3.hour
-        martes_min_extra = martes3.minute
-        martes_sec_extra = martes3.second
-
-        # miercoles3 = datetime.datetime.strptime(x[2].overhour, DATETIME_FORMAT)
-        # miercoles_hora_extra = miercoles3.hour
-        # miercoles_min_extra = miercoles3.minute
-        # miercoles_sec_extra = miercoles3.second
-
-        jueves3 = datetime.datetime.strptime(x[3].overhour, DATETIME_FORMAT)
-        jueves_hora_extra = jueves3.hour
-        jueves_min_extra = jueves3.minute
-        jueves_sec_extra = jueves3.second
-
-        # viernes3 = datetime.datetime.strptime(x[4].overhour, DATETIME_FORMAT)
-        # viernes_hora_extra = viernes3.hour
-        # viernes_min_extra = viernes3.minute
-        # viernes_sec_extra = viernes3.second
-
-        #-------------------------------------------------------------#
-
-        horas = lunes_hora + martes_hora + miercoles_hora + jueves_hora + viernes_hora
-        minutos = lunes_min + martes_min + miercoles_min + jueves_min + viernes_min
-        segundos = lunes_sec + martes_sec + miercoles_sec + jueves_sec + viernes_sec
-
-        #-------------------------------------------------------------#
-
-        horas_faltantes = miercoles_hora_left +  viernes_hora_left
-        minutos_faltantes =  miercoles_min_left
-        segundos_faltantes = miercoles_sec_left +  viernes_sec_left
-
-        #-------------------------------------------------------------#
-
-        horas_extra = lunes_hora_extra + martes_hora_extra + jueves_hora_extra
-        minutos_extra = lunes_min_extra + martes_min_extra + jueves_min_extra
-        segundos_extra = lunes_sec_extra + martes_sec_extra + jueves_sec_extra
-
-        variables = {}
-        al = {}
-        pedo =  []
+        h = 0
+        m = 0
+        s = 0
+        for i in x:
+            lista1 = i.hours.split(':')
+            h += int(lista1[0])
+            m += int(lista1[1])
+            s += int(lista1[2])
+        while s>=60:
+            s-=60
+            m+=1
+        while m>=60:
+            m-=60
+            h+=1
+        lista2 = [h,m,s]
+        self.var = str(lista2[0]) + ":" + str(lista2[1]) + ":" + str(lista2[2]) + str("/") + str("45")
 
 
 
@@ -265,7 +184,7 @@ class registro(models.Model):
                 self.overhour = ''
 
             lineas = {
-                    'day':self.day,
+#                    'day':self.day,
                     'hours':self.hours,
                     'left':self.left,
                     'overhour':self.overhour,
@@ -291,7 +210,7 @@ class detalle(models.Model):
     overhour = fields.Char(string="Horas Extras")
     check_in = fields.Datetime(string = 'Entrada')
     check_out = fields.Datetime(string = 'Salida')
-    week_load = fields.Float(string="Carga Semanal")#, compute='_carga_semanal')
+    week_load = fields.Float(string="Carga Diaria")#, compute='_carga_semanal')
 
     # @api.one
     # @api.depends('hours', 'week_load')

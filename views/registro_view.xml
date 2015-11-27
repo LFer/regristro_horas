@@ -15,11 +15,11 @@
                         <group>
                             <field name="check_in"/>
                             <field name="check_out"/>
-                            <field name="hora_aproximada"/>
+                            <field name="hora_aproximada" readonly="1"/>
                         </group>
                         <button name="horas_trabajadas" type="object" string="Calcular Horas Trabajadas"/>
                         <button name="estimar_horas_trabajadas" type="object" string="Estimar Salida"/>
-                        <button name="sumer_horas_semanales" type="object" string="Semanales"/>
+                        <button name="sumer_horas_semanales" type="object" string="Sumar Horas Trabajas"/>
                         <field name="detalle_ids" widget="one2many_list" mode="tree">
                             <tree string="Detalle" editable="bottom">
                                 <field name="day"/>
@@ -33,10 +33,10 @@
                         </field>
                             <group class="oe_subtotal_footer oe_right" colspan="2" name="order_total">
                                 <div class="oe_subtotal_footer_separator oe_inline">
-                                    <label for="week_load" />
+                                    <label for="var" />
                                     <button name="button_dummy"  string="(update)" class="oe_edit_only oe_link"/>
                                 </div>
-                                <field name="week_load" nolabel="1" class="oe_subtotal_footer_separator"/>
+                                <field name="var" nolabel="1" class="oe_subtotal_footer_separator"/>
                             </group>
                         <div class="oe_clear"/>
                     </sheet>
