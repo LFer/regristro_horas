@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <openerp>
     <data>
+
         <record model="ir.ui.view" id="registro_form_view">
             <field name="name">registro.form</field>
             <field name="model">registro</field>
@@ -43,24 +44,6 @@
                 </form>
             </field>
         </record>
-        <!--
-                        <page string="Alquiler por temporada" attrs="{ 'invisible' : [ ( 'state', 'in', [ 'enventa' ] ) ] }" >
-                    <field name="temporada_ids" widget="one2many_list" mode="tree">
-                        <tree string="Alquiler por temporada" editable="bottom">
-                            <field name="cliente_1"/>
-                            <field name="usuario_1"/>
-                            <field name="currency_al" domain="['|',( 'name','=','USD' ),( 'name','=','UYP' )]" />
-                            <field name="fecha_inicio" on_change="get_number_of_days(fecha_inicio,fecha_fin, rent_day)" />
-                            <field name="fecha_fin" on_change="get_number_of_days(fecha_inicio,fecha_fin, rent_day)" />
-                            <field name="rent_day"/>
-                            <field name="rent_price"/>
-                            <field name="result"/>
-                            <field name="costo_alquiler"/>
-                            <field name="pago_1"/>
-                        </tree>
-                    </field>
-                </page>
-        -->
 
         <record model="ir.ui.view" id="registro_tree_view">
             <field name="name">registro.tree</field>
@@ -78,23 +61,10 @@
             </field>
         </record>
 
-
-        <!--
-        <record model="ir.actions.act_window" id="course_list_action">
-            <field name="name">Courses</field>
-            <field name="res_model">openacademy.course</field>
-            <field name="view_type">form</field>
-            <field name="view_mode">tree,form</field>
-            <field name="context" eval="{'search_default_my_courses': 1}"/>
-            <field name="help" type="html">
-                <p class="oe_view_nocontent_create">Create the first course
-                </p>
-            </field>
-        </record>
-        -->
         <record model="ir.actions.act_window" id="registro_action">
             <field name="name">Registro de Horas</field>
             <field name="res_model">registro</field>
+            <field name="context">{'search_default_group_month': 1}</field>
             <field name="view_type">form</field>
             <field name="view_mode">tree,form</field>
             <field name="help" type="html">
@@ -102,6 +72,22 @@
                 </p>
             </field>
         </record>
+
+        <!--Search View-->
+        <record id="registro_filter" model="ir.ui.view">
+            <field name="name">registro.filter.search</field>
+            <field name="model">registro</field>
+            <field name="arch" type="xml">
+                <search string="Registro de horas">
+                <!-- Agrupar -->
+                <separator/>
+                <group expand="0" string="Agrupar por ...">
+                    <filter string="Mes" context="{'group_by': 'name'}"  name="group_month"/>
+                    <filter string="Semana" context="{'group_by': 'check_in'}"/>
+                </group>
+            </search>
+         </field>
+     </record>
 
 
 
@@ -111,69 +97,6 @@
         <menuitem id="registro_menu" name="Registro" parent="registro_main_menu"/>
         <!--sub-menu-->
         <menuitem id="registro" name="Rgistro de Horas" parent="registro_menu" action="registro_action"/>
-        <!--<menuitem id="registro" name="Rgistro Horario" parent="registro_menu" action="course_list_action"/>-->
-        <!-- Full id location:
-             action="openacademy.course_list_action"
-             It is not required when it is the same module -->
-
-        <!-- session form view -->
-        <!--
-        <record model="ir.ui.view" id="session_form_view">
-            <field name="name">session.form</field>
-            <field name="model">openacademy.session</field>
-            <field name="arch" type="xml">
-                <form string="Session Form">
-                    <header>
-                        <button name="draft" type="workflow"
-                                string="Reset to draft"
-                                states="confirmed,done"/>
-                        <button name="confirm" type="workflow"
-                                string="Confirm" states="draft"
-                                class="oe_highlight"/>
-                        <button name="done" type="workflow"
-                                string="Mark as done" states="confirmed"
-                                class="oe_highlight"/>
-                        <field name="state" widget="statusbar"/>
-                    </header>
-                    <sheet>
-                        <group>
-                            <group string="General">
-                                <field name="course_id"/>
-                                <field name="name"/>
-                                <field name="instructor_id"/>
-                                <field name="active"/>
-                            </group>
-                            <group string="Schedule">
-                                <field name="start_date"/>
-                                <field name="duration"/>
-                                <field name="seats"/>
-                                <field name="taken_seats" widget="progressbar"/>
-                            </group>
-                        </group>
-                        <label for="attendee_ids"/>
-                        <field name="attendee_ids"/>
-                    </sheet>
-                </form>
-            </field>
-        </record>
-        -->
-
-
-        <!-- session tree/list view -->
-        <!--
-        <record model="ir.ui.view" id="session_tree_view">
-            <field name="name">session.tree</field>
-            <field name="model">openacademy.session</field>
-            <field name="arch" type="xml">
-                <tree string="Session Tree" colors="#0000ff:duration&lt;5;red:duration&gt;15">
-                    <field name="name"/>
-                    <field name="course_id"/>
-                    <field name="duration" invisible="1"/>
-                    <field name="taken_seats" widget="progressbar"/>
-                </tree>
-            </field>
-        </record>
-        -->
 
         <!-- calendar view -->
         <!--
