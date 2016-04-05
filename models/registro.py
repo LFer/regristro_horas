@@ -10,7 +10,7 @@ import time
 from datetime import timedelta
 import math
 from datetime import date
-
+import calendar
 
 class registro(models.Model):
     _name="registro"
@@ -22,6 +22,7 @@ class registro(models.Model):
     detalle_ids = fields.One2many(comodel_name='detalle', inverse_name='registro_id')#, readonly=True)
     #para probar las funciones
     day = fields.Char(string="Dia", compute='_get_day')
+    week_day = fields.Char(string="Dia")
     hours = fields.Char(string="Tiempo Trabajado")
     left = fields.Char(string="Compensar")
     overhour = fields.Char(string="Horas Extras")
@@ -29,17 +30,6 @@ class registro(models.Model):
     var = fields.Char(string="Carga Semanal")#, compute='sumer_horas_semanales')
     hora_aproximada = fields.Char(string="Hora estamiada de relevo")
 
-
-
-
-    # @api.one
-    # @api.depends('week_load')
-    # def _week_load(self):
-    #     pdb.set_trace()
-    #     if not self.var:
-    #         self.week_load = 0.0
-    #     else:
-    #         self.week_load = 100.0 * self.hours / 45
 
     @api.one
     @api.depends('day')
@@ -49,49 +39,13 @@ class registro(models.Model):
 
     @api.one
     def _check_lenght_lines(self):
-#
         if len(self.detalle_ids)>=5:
             raise exceptions.ValidationError("No puede agregar mas de 5 linas por semana!")
-
-
-    # def _function(self):
-    #     i = 0
-    #     if self.var<=36:
-    #         for x in (self.detalle_ids):
-    #             i += x.hours
-    #     self.var = i
-
 
     @api.one
     def _check_lenght_lines(self):
-#
         if len(self.detalle_ids)>=5:
             raise exceptions.ValidationError("No puede agregar mas de 5 linas por semana!")
-
-#     @api.one
-#     @api.onchange('check_in')
-#     def fecha_entrada(self):
-# #        pdb.set_trace()
-#         day = str((datetime.date.today().strftime("%A"),datetime.date.today().strftime("%d"),"de",datetime.date.today().strftime("%B"),"del", datetime.date.today().strftime("%Y"))).replace("'","").replace(",","").replace("(","").replace(")","")
-#         if not self.check_in:
-#             pass
-#         else:
-#             self.day = day
-
-#     @api.one
-#     @api.onchange('check_in')
-#     def fecha(self):
-# #        pdb.set_trace()
-#         day = str((datetime.date.today().strftime("%A"),datetime.date.today().strftime("%d"),"de",datetime.date.today().strftime("%B"),"del", datetime.date.today().strftime("%Y"))).replace("'","").replace(",","").replace("(","").replace(")","")
-#         if not self.day:
-#             self.day = day
-#         else:
-#             self.day = day
-
-#         if self.day:
-#             self.day = day
-#         else:
-#             self.day = day
 
     @api.one
     def _check_lines(self):#TODO Hacerla mas escricta
@@ -150,15 +104,31 @@ class registro(models.Model):
         self.var = str(lista2[0]) + ":" + str(lista2[1]) + ":" + str(lista2[2]) + str("/") + str("45")
 
 
-
-
-
-
     @api.one
     def horas_trabajadas(self):
-#        pdb.set_trace()
+        pdb.set_trace()
         self._check_lines()
         self._check_lenght_lines()
+
+        #Vemos si podemos agarrar el dia
+        weekday = date.today()
+        today = calendar.day_name[weekday.weekday()]
+        if today == 'Monday':
+            self.week_day = 'Lunes'
+
+        if today == 'Tuesday':
+            self.week_day = 'Martes'
+
+        if today == 'Wednesday':
+            self.week_day = 'Miércoles'
+
+        if today == 'Thursday':
+            self.week_day = 'Jueves'
+
+        if today == 'Friday':
+            self.week_day == 'Viernes'
+
+
         res = ""
         if (self.check_out and self.check_in) and (self.check_in <= self.check_out):
             DATETIME_FORMAT = "%Y-%m-%d %H:%M:%S"
@@ -184,7 +154,7 @@ class registro(models.Model):
                 self.overhour = ''
 
             lineas = {
-#                    'day':self.day,
+                    'week_day':self.week_day,
                     'hours':self.hours,
                     'left':self.left,
                     'overhour':self.overhour,
@@ -205,23 +175,10 @@ class detalle(models.Model):
     name = fields.Char()
     registro_id = fields.Many2one('registro')
     day = fields.Char(string="Dia")#, compute='_get_day')
+    week_day = fields.Char(string="Dia")
     hours = fields.Char(string="Horas")
     left = fields.Char(string="Compensar")
     overhour = fields.Char(string="Horas Extras")
     check_in = fields.Datetime(string = 'Entrada')
     check_out = fields.Datetime(string = 'Salida')
     week_load = fields.Float(string="Carga Diaria")#, compute='_carga_semanal')
-
-    # @api.one
-    # @api.depends('hours', 'week_load')
-    # def _carga_semanal(self):
-    #     if not self.hours:
-    #         self.week_load = 0.0
-    #     else:
-    #         self.week_load = 100 * self.hours/9
-
-    # @api.one
-    # @api.depends('day')
-    # def _get_day(self):
-    #     day = str((datetime.date.today().strftime("%A"),datetime.date.today().strftime("%d"),"de",datetime.date.today().strftime("%B"),"del", datetime.date.today().strftime("%Y"))).replace("'","").replace(",","").replace("(","").replace(")","")
-    #     self.day = day
