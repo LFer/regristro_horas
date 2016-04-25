@@ -27,7 +27,7 @@ class registro(models.Model):
     left = fields.Char(string="Compensar")
     overhour = fields.Char(string="Horas Extras")
     week_load = fields.Float(string="Carga Semanal")#, compute='_week_load')
-    var = fields.Char(string="Carga Semanal")#, compute='sumer_horas_semanales')
+    var = fields.Char(string="Carga Semanal", readonly=True)#, compute='sumer_horas_semanales')
     hora_aproximada = fields.Char(string="Hora estamiada de relevo")
 
 
@@ -101,12 +101,12 @@ class registro(models.Model):
             m-=60
             h+=1
         lista2 = [h,m,s]
-        self.var = str(lista2[0]) + ":" + str(lista2[1]) + ":" + str(lista2[2]) + str("/") + str("45")
+        self.var = str(lista2[0]) + ":" + str(lista2[1]) + str("/") + str("45")
 
 
     @api.one
     def horas_trabajadas(self):
-        pdb.set_trace()
+        #pdb.set_trace()
         self._check_lines()
         self._check_lenght_lines()
 
